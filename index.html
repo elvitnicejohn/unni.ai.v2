@@ -442,5 +442,38 @@
       }, 800 + Math.random() * 1200); // random typing delay
     }
   </script>
+  <script>
+const API_KEY = "YOUR_OPENWEATHER_API_KEY";
+const CITY = "Abu Shagara, AE";
+
+async function getWeather() {
+  const res = await fetch(`https://api.openweathermap.org/data/2.5/weather?q=${CITY}&units=metric&appid=${API_KEY}`);
+  const data = await res.json();
+  const temp = data.main.temp;
+  const desc = data.weather[0].description;
+  return `The weather in Abu Shagara is ${temp}°C with ${desc}.`;
+}
+
+async function handleMessage(input) {
+  input = input.toLowerCase().trim();
+
+  if (input === "weather") {
+    const weatherMsg = await getWeather();
+    addMessage("bot", weatherMsg);
+  } else {
+    addMessage("bot", "idk what that means yet 😅");
+  }
+}
+
+function addMessage(sender, text) {
+  const chat = document.getElementById("chat");
+  const msg = document.createElement("div");
+  msg.className = sender;
+  msg.textContent = text;
+  chat.appendChild(msg);
+}
+</script>
+
 </body>
 </html>
+
