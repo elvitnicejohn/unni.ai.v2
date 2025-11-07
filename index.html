@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>unni.2.0 - Birthday Edition</title>
+  <style>
+    @keyframes gradientBG {
+      0% { background-position: 0px 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0px 50%; }
+    }
+    
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(-45deg, #0f2027, #203a43, #2c5364, #00d4ff, #1e3c72);
+      background-size: 400% 400%;
+      animation: gradientBG 15s ease infinite;
+      color: white;
+    }
+
+    h1 {
+      font-size: 80px;
+      text-align: center;
+      margin-bottom: 10px;
+      color: #00d4ff;
+      text-shadow: 2px 2px 20px rgba(0, 212, 255, 0.7);
+      font-weight: 800;
+    }
+
+    .subtitle {
+      font-size: 18px;
+      color: #87ceeb;
+      margin-bottom: 20px;
+      text-align: center;
+    }
+
+    #chatbox {
+      width: 450px;
+      height: 550px;
+      background: rgba(15, 32, 39, 0.7);
+      backdrop-filter: blur(15px);
+      border-radius: 20px;
+      border: 2px solid rgba(0, 212, 255, 0.3);
+      box-shadow: 0 8px 30px rgba(0, 212, 255, 0.3);
+      display: flex;
+      flex-direction: column;
+      padding: 20px;
+      overflow: hidden;
+      position: relative;
+    }
+
+    #chatHistory {
+      flex-grow: 1;
+      overflow-y: auto;
+      padding-right: 5px;
+      margin-bottom: 10px;
+    }
+
+    #chatHistory::-webkit-scrollbar {
+      width: 6px;
+    }
+
+    #chatHistory::-webkit-scrollbar-track {
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 10px;
+    }
+
+    #chatHistory::-webkit-scrollbar-thumb {
+      background: rgba(0, 212, 255, 0.5);
+      border-radius: 10px;
+    }
+
+    #userInput {
+      width: calc(100% - 20px);
+      padding: 12px;
+      margin-top: 10px;
+      border-radius: 12px;
+      border: 2px solid rgba(0, 212, 255, 0.3);
+      background: rgba(0, 0, 0, 0.3);
+      color: white;
+      font-size: 16px;
+      outline: none;
+      transition: border 0.3s;
+    }
+
+    #userInput:focus {
+      border: 2px solid rgba(0, 212, 255, 0.6);
+    }
+
+    #userInput::placeholder {
+      color: rgba(135, 206, 235, 0.6);
+    }
+
+    .message {
+      margin: 10px 0;
+      padding: 10px 14px;
+      border-radius: 15px;
+      max-width: 80%;
+      word-wrap: break-word;
+      line-height: 1.5;
+      opacity: 0;
+      animation: fadeIn 0.4s forwards;
+    }
+
+    .user {
+      background: linear-gradient(135deg, #00d4ff, #0099cc);
+      align-self: flex-end;
+      color: #fff;
+      margin-left: auto;
+      box-shadow: 0 4px 10px rgba(0, 212, 255, 0.3);
+    }
+
+    .bot {
+      background: linear-gradient(135deg, #1e3c72, #2a5298);
+      align-self: flex-start;
+      color: #fff;
+      box-shadow: 0 4px 10px rgba(30, 60, 114, 0.4);
+    }
+
+    @keyframes fadeIn {
+      to { opacity: 1; }
+    }
+
+    #typingIndicator {
+      font-style: italic;
+      margin: 5px 0;
+      color: #87ceeb;
+      display: none;
+      font-size: 14px;
+    }
+
+    .birthday-badge {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      background: linear-gradient(135deg, #ffd700, #ffaa00);
+      color: #000;
+      padding: 5px 10px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+  <h1>🎉 unni.ai 2.0</h1>
+  <div class="subtitle">Happy 8th Birthday Elvin! 🎂⚽🏏</div>
+
+  <div id="chatbox">
+    <div class="birthday-badge">🎈 Birthday Edition</div>
+    <div id="chatHistory"></div>
+    <div id="typingIndicator">unni is typing...</div>
+    <input type="text" id="userInput" placeholder="Ask me anything, champ... ⚽🏏" onkeydown="if(event.key === 'Enter') sendMessage()">
+  </div>
+
+  <script>
+    const facts = [
+      "honey never spoils archaeologists found 3000 year old honey in egyptian tombs that was still edible",
+      "octopuses have three hearts and blue blood",
+      "bananas are berries but strawberries are not",
+      "a day on venus is longer than its year",
+      "sharks existed before trees",
+      "there are more stars in the universe than grains of sand on all beaches on earth",
+      "your brain uses 20 percent of your bodys energy but only makes up 2 percent of your weight",
+      "the eiffel tower can grow up to 6 inches taller in summer due to thermal expansion",
+      "wombat poop is cube shaped",
+      "sea otters hold hands while sleeping so they dont drift apart",
+      "a group of flamingos is called a flamboyance",
+      "humans share 50 percent of their dna with bananas",
+      "the inventor of the frisbee was turned into a frisbee after he died",
+      "the unicorn is scotlands national animal",
+      "astronauts cant cry in space because of zero gravity tears dont fall",
+      "the shortest war in history lasted 38 minutes between britain and zanzibar",
+      "cleopatra lived closer to the moon landing than to the building of the pyramids",
+      "there are more possible iterations of a game of chess than atoms in the observable universe",
+      "the heart of a shrimp is located in its head",
+      "a snail can sleep for three years straight",
+      "the worlds oldest known recipe is for beer",
+      "dolphins have names for each other",
+      "a single bolt of lightning contains enough energy to toast 100000 slices of bread",
+      "the blob of toothpaste on a toothbrush is called a nurdle",
+      "cows have best friends and get stressed when separated",
+      "butterflies can taste with their feet",
+      "the human nose can detect over 1 trillion different scents",
+      "pizza was invented in naples italy around 1860",
+      "the longest time between two twins being born is 87 days",
+      "some cats are allergic to humans",
+      "the average person walks the equivalent of three times around the world in a lifetime",
+      "peanuts are not nuts they are legumes",
+      "the total weight of ants on earth is greater than the weight of all humans",
+      "a jiffy is an actual unit of time one 100th of a second",
+      "the strongest muscle in the human body is the tongue",
+      "babies have 300 bones at birth adults have 206",
+      "the worlds quietest room is so quiet you can hear your blood flowing",
+      "apples float in water because they are 25 percent air",
+      "the shortest complete sentence in english is go",
+      "humans are the only animals that blush",
+      "your stomach gets a new lining every 3 to 4 days to prevent it from digesting itself",
+      "the sum of all numbers from 1 to 100 is 5050",
+      "an ostrichs eye is bigger than its brain",
+      "the moon is moving away from earth at 3.8 cm per year",
+      "hot water freezes faster than cold water under certain conditions",
+      "the fingerprints of koalas are so similar to humans that they have been confused at crime scenes",
+      "there are more libraries than mcdonalds in the united states",
+      "the smell of freshly cut grass is actually a plant distress signal",
+      "carrots were originally purple before the 17th century",
+      "a cockroach can live for weeks without its head",
+      "you cant hum while holding your nose closed",
+      "the longest english word without a vowel is rhythms",
+      "lightning strikes the earth about 100 times per second",
+      "the inventor of the pringles can is now buried in one",
+      "your blood vessels could circle the earth 2.5 times if laid end to end",
+      "a group of owls is called a parliament",
+      "marie curies research papers are still radioactive and will be for 1500 years",
+      "the great wall of china is not visible from space with the naked eye",
+      "mount everest grows about 4mm every year",
+      "water can boil and freeze at the same time called triple point",
+      "the average cloud weighs around 1.1 million pounds",
+      "humans and giraffes have the same number of neck vertebrae",
+      "the antarctic is technically a desert",
+      "a bolt from a crossbow travels at about 300 feet per second",
+      "mosquitoes are the deadliest animals to humans causing millions of deaths yearly",
+      "the pacific ocean is larger than all land masses combined",
+      "your ears never stop growing",
+      "the worlds oldest operating library is in morocco built in 859 ad",
+      "a typical microwave oven uses more electricity keeping its digital clock lit than heating food",
+      "humans can distinguish between at least one trillion different odors",
+      "the probability of you being born was about 1 in 400 trillion",
+      "the longest wedding veil was longer than 63 football fields",
+      "rain has never been recorded in some parts of chiles atacama desert",
+      "the wood frog can hold its pee for up to eight months",
+      "the dot over the letter i is called a tittle",
+      "mammoths were still alive when the great pyramid was being built",
+      "oxford university is older than the aztec empire",
+      "there are more tigers in captivity in texas than in the wild globally",
+      "the hawaiian alphabet has only 13 letters",
+      "scotland has 421 words for snow",
+      "the speed of light is exactly 299792458 meters per second",
+      "the human brain is 73 percent water",
+      "a group of pugs is called a grumble",
+      "the word queue is the only word pronounced the same with or without its last 4 letters",
+      "the average person spends 6 months of their lifetime waiting for red lights to turn green",
+      "venus is the only planet that rotates clockwise",
+      "a blue whales heart weighs as much as a small car",
+      "the burj khalifa in dubai is so tall you can watch the sunset twice from different floors",
+      "the human eye can distinguish about 10 million different colors",
+      "a single strand of spaghetti is called a spaghetto",
+      "the shortest war ever was 38 to 45 minutes depending on the clock",
+      "theres a basketball court on the top floor of the us supreme court building",
+      "polar bears have black skin under their white fur",
+      "the total length of all the nerves in your body is 45 miles",
+      "a group of jellyfish is called a smack",
+      "the inventor of the word nerd was dr seuss",
+      "humans share 98.8 percent of their dna with chimpanzees",
+      "the sahara desert is expanding at a rate of 30 miles per year",
+      "a crocodile cannot stick its tongue out",
+      "the fear of long words is called hippopotomonstrosesquippedaliophobia",
+      "dead skin cells are a main ingredient in household dust",
+      "there are more life forms on your body than people on earth",
+      "the coldest temperature ever recorded on earth was minus 128.6 fahrenheit in antarctica",
+      "the human body contains enough carbon to fill 9000 pencils"
+    ];
+
+    const footballFacts = [
+      "messi has won 8 ballon dor awards the most in history",
+      "the fastest goal in world cup history was scored in 11 seconds by hakan sukur",
+      "brazil has won the most world cups with 5 titles",
+      "pele scored 1283 goals in his career insane numbers",
+      "the most expensive football transfer was neymar to psg for 222 million euros",
+      "cristiano ronaldo has scored over 800 career goals",
+      "the champions league was called the european cup until 1992",
+      "a regulation football weighs between 14 to 16 ounces",
+      "the oldest football club is sheffield fc founded in 1857",
+      "the fastest shot recorded was 131 mph by ronny heberson",
+      "zinedine zidanes headbutt in 2006 world cup final is legendary",
+      "maradonas hand of god goal is one of the most controversial ever",
+      "barcelona and real madrids el clasico is the most watched club match",
+      "leicester city won the premier league in 2016 at 5000 to 1 odds",
+      "pele was only 17 when he won his first world cup in 1958"
+    ];
+
+    const cricketFacts = [
+      "sachin tendulkar is called the god of cricket for a reason",
+      "the longest cricket match lasted 14 days between england and south africa in 1939",
+      "chris gayle holds the record for fastest t20 century in just 30 balls",
+      "brian lara scored 400 not out the highest individual test score",
+      "the ashes series between england and australia started in 1882",
+      "cricket balls are made of cork covered with leather and weigh between 5.5 to 5.75 ounces",
+      "virat kohli is one of the fastest to reach 70 international centuries",
+      "ms dhoni is known as captain cool for his calm leadership",
+      "the ipl is one of the richest cricket leagues in the world",
+      "a cricket pitch is 22 yards or 20.12 meters long",
+      "shahid afridi hit the fastest odi century in just 37 balls",
+      "don bradmans test batting average of 99.94 is considered impossible to beat",
+      "yuvraj singh hit 6 sixes in one over against england in 2007 t20 world cup",
+      "wasim akram is called the sultan of swing for his legendary bowling",
+      "india won their first world cup in 1983 led by kapil dev"
+    ];
+
+    const jokes = [
+      "what do you call a can opener that doesnt work? a cant opener 😂",
+      "why did the golfer bring two pairs of pants? in case he got a hole in one ⛳",
+      "what do you call a fish wearing a bowtie? so fish ticated 🐟",
+      "why cant your nose be 12 inches long? because then itd be a foot 👃",
+      "what did one ocean say to the other ocean? nothing they just waved 🌊",
+      "why dont scientists trust atoms? because they make up everything ⚛️",
+      "what do you call a bear with no teeth? a gummy bear 🐻",
+      "why did the scarecrow win an award? he was outstanding in his field 🌾",
+      "what do you call a pile of cats? a meowtain 🐱",
+      "why did the bicycle fall over? it was two tired 🚲"
+    ];
+
+    const advice = [
+      "dont chase people chase purpose",
+      "listen more than you speak you will learn twice as much",
+      "consistency beats motivation every time",
+      "you dont need to have it all figured out to start",
+      "stay curious not judgmental",
+      "your network is your net worth connect with good people",
+      "fail fast learn faster",
+      "comparison is the thief of joy run your own race",
+      "invest in yourself its the best investment you will ever make",
+      "discipline is choosing between what you want now and what you want most"
+    ];
+
+    function isSaturday() {
+      return new Date().getDay() === 6;
+    }
+
+    function getGreeting() {
+      return isSaturday() ? "Bleach" : "Elvin";
+    }
+
+    window.onload = function() {
+      setTimeout(function() {
+        var chatHistory = document.getElementById("chatHistory");
+        var botMsg = document.createElement("div");
+        botMsg.classList.add("message", "bot");
+        botMsg.textContent = "🎉 YO ELVIN! HAPPY 8TH BIRTHDAY BRO! 🎂\n\nI'm Unni AI 2.0. Your boy made me just for you! I know you love football and cricket so lets talk sports get some facts or just vibe! Ask me anything champ! ⚽🏏";
+        chatHistory.appendChild(botMsg);
+        chatHistory.scrollTop = chatHistory.scrollHeight;
+      }, 500);
+    };
+
+    function getResponse(input) {
+      var lowerInput = input.toLowerCase();
+
+      if (isSaturday() && (lowerInput.includes("name") || lowerInput.includes("who are you"))) {
+        return "Its Saturday bro so today youre Bleach! 😂 Your boys got his reasons lol. Just roll with it!";
+      }
+
+      if (lowerInput.includes("football") || lowerInput.includes("soccer") || lowerInput.includes("messi") || lowerInput.includes("ronaldo")) {
+        var responses = [
+          "Yo " + getGreeting() + " football talk! ⚽ " + footballFacts[Math.floor(Math.random() * footballFacts.length)],
+          getGreeting() + " my man! Football is life! " + footballFacts[Math.floor(Math.random() * footballFacts.length)],
+          "Ayyy " + getGreeting() + "! " + footballFacts[Math.floor(Math.random() * footballFacts.length)] + " Whats your take?",
+          getGreeting() + " you know ball! ⚽ " + footballFacts[Math.floor(Math.random() * footballFacts.length)]
+        ];
+        return responses[Math.floor(Math.random() * responses.length)];
+      }
+
+      if (lowerInput.includes("cricket") || lowerInput.includes("bat") || lowerInput.includes("bowl") || lowerInput.includes("wicket")) {
+        var responses = [
+          "CRICKET! " + getGreeting() + " now were talking! 🏏 " + cricketFacts[Math.floor(Math.random() * cricketFacts.length)],
+          "Yo " + getGreeting() + " cricket is elite! " + cricketFacts[Math.floor(Math.random() * cricketFacts.length)],
+          getGreeting() + " my guy! 🏏 " + cricketFacts[Math.floor(Math.random() * cricketFacts.length)],
+          "Ayyy " + getGreeting() + "! " + cricketFacts[Math.floor(Math.random() * cricketFacts.length)] + " What you think?"
+        ];
+        return responses[Math.floor(Math.random() * responses.length)];
+      }
+
+      if (lowerInput.includes("birthday") || lowerInput.includes("18")) {
+        return "Yo " + getGreeting() + " 18 is HUGE! Youre officially an adult now but we both know youll act the same lmao 😂 Make this year legendary bro! 🎉🎂";
+      }
+
+      if (lowerInput.includes("hi") || lowerInput.includes("hello") || lowerInput.includes("hey")) {
+        return "Hey " + getGreeting() + "! Whats good bro? Ask me about football cricket facts or anything! 💪";
+      }
+
+      if (lowerInput.includes("fact") || lowerInput.includes("tell me something") || lowerInput.includes("interesting")) {
+        return "Yo " + getGreeting() + " check this out: " + facts[Math.floor(Math.random() * facts.length)] + " 🧠";
+      }
+
+      if (lowerInput.includes("joke") || lowerInput.includes("funny") || lowerInput.includes("laugh")) {
+        return jokes[Math.floor(Math.random() * jokes.length)];
+      }
+
+      if (lowerInput.includes("advice") || lowerInput.includes("tip") || lowerInput.includes("help me")) {
+        return getGreeting() + " heres some real talk: " + advice[Math.floor(Math.random() * advice.length)] + " 💯";
+      }
+
+      if (lowerInput.includes("your name") || lowerInput.includes("who are you")) {
+        return "Im Unni AI 2.0 " + getGreeting() + "! Your personal AI made just for your 18th birthday! I know you love football and cricket so lets chat about that or anything else! 🎂⚽🏏";
+      }
+
+      if (lowerInput.includes("thanks") || lowerInput.includes("thank you") || lowerInput.includes("sheesh")) {
+        return "No problem " + getGreeting() + "! Thats what Im here for bro! 💪";
+      }
+
+      if (lowerInput.includes("bye") || lowerInput.includes("goodbye") || lowerInput.includes("see you")) {
+        return "Later " + getGreeting() + "! Have an awesome day bro! 🎉";
+              }
+
+      // fallback for anything else
+      return "Haha " + getGreeting() + ", I dont have a reply for that yet 😎 Try asking about football, cricket, jokes, facts, or advice!";
+    }
+
+    function sendMessage() {
+      var inputBox = document.getElementById("userInput");
+      var chatHistory = document.getElementById("chatHistory");
+      var typingIndicator = document.getElementById("typingIndicator");
+      var userText = inputBox.value.trim();
+      if (userText === "") return;
+
+      // show user's message
+      var userMsg = document.createElement("div");
+      userMsg.classList.add("message", "user");
+      userMsg.textContent = userText;
+      chatHistory.appendChild(userMsg);
+      chatHistory.scrollTop = chatHistory.scrollHeight;
+
+      inputBox.value = "";
+
+      // show typing indicator
+      typingIndicator.style.display = "block";
+
+      setTimeout(function() {
+        typingIndicator.style.display = "none";
+
+        var botMsg = document.createElement("div");
+        botMsg.classList.add("message", "bot");
+        botMsg.textContent = getResponse(userText);
+        chatHistory.appendChild(botMsg);
+        chatHistory.scrollTop = chatHistory.scrollHeight;
+      }, 800 + Math.random() * 1200); // random typing delay
+    }
+  </script>
+</body>
+</html>
